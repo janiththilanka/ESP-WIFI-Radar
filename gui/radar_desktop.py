@@ -27,70 +27,37 @@ except ImportError:
     SERIAL_AVAILABLE = False
 
 
-# Theme Palettes matching Web UI
-THEMES = {
-    "light": {
-        "bg_main": "#edf1f5",
-        "bg_card": "#ffffff",
-        "bg_subtle": "#f8fafc",
-        "border": "#e2e7ec",
-        "text_primary": "#1e242b",
-        "text_muted": "#64748b",
-        "text_accent": "#0284c7",
-        "score_color": "#0284c7",
-        "limit_color": "#d97706",
-        "baseline_color": "#475569",
-        "alert_bg": "#fef2f2",
-        "alert_border": "#ef4444",
-        "alert_text": "#b91c1c",
-        "ok_bg": "#f0fdf4",
-        "ok_border": "#22c55e",
-        "ok_text": "#15803d",
-        "radar_bg": "#ffffff",
-        "radar_grid": "#d1d9e2",
-        "radar_sweep": "#0284c7",
-        "radar_blip": "#ef4444",
-        "spectrum_bar": "#0284c7",
-        "spectrum_bg": "#f8fafc",
-        "wave_bg": "#ffffff",
-        "wave_grid": "#f1f5f9",
-        "header_bg": "#ffffff",
-        "footer_bg": "#1e242b",
-        "footer_text": "#94a3b8",
-        "btn_primary_bg": "#0284c7",
-        "btn_primary_fg": "#ffffff",
-    },
-    "dark": {
-        "bg_main": "#0f172a",
-        "bg_card": "#1e293b",
-        "bg_subtle": "#172033",
-        "border": "#334155",
-        "text_primary": "#f8fafc",
-        "text_muted": "#94a3b8",
-        "text_accent": "#38bdf8",
-        "score_color": "#38bdf8",
-        "limit_color": "#fbbf24",
-        "baseline_color": "#94a3b8",
-        "alert_bg": "#450a0a",
-        "alert_border": "#dc2626",
-        "alert_text": "#fca5a5",
-        "ok_bg": "#052e16",
-        "ok_border": "#16a34a",
-        "ok_text": "#86efac",
-        "radar_bg": "#090d16",
-        "radar_grid": "#1e293b",
-        "radar_sweep": "#38bdf8",
-        "radar_blip": "#f87171",
-        "spectrum_bar": "#38bdf8",
-        "spectrum_bg": "#090d16",
-        "wave_bg": "#090d16",
-        "wave_grid": "#1e293b",
-        "header_bg": "#1e293b",
-        "footer_bg": "#090d16",
-        "footer_text": "#64748b",
-        "btn_primary_bg": "#0284c7",
-        "btn_primary_fg": "#ffffff",
-    }
+# Unified Visual Palette
+THEME = {
+    "bg_main": "#edf1f5",
+    "bg_card": "#ffffff",
+    "bg_subtle": "#f8fafc",
+    "border": "#e2e7ec",
+    "text_primary": "#1e242b",
+    "text_muted": "#64748b",
+    "text_accent": "#0284c7",
+    "score_color": "#0284c7",
+    "limit_color": "#d97706",
+    "baseline_color": "#475569",
+    "alert_bg": "#fef2f2",
+    "alert_border": "#ef4444",
+    "alert_text": "#b91c1c",
+    "ok_bg": "#f0fdf4",
+    "ok_border": "#22c55e",
+    "ok_text": "#15803d",
+    "radar_bg": "#ffffff",
+    "radar_grid": "#d1d9e2",
+    "radar_sweep": "#0284c7",
+    "radar_blip": "#ef4444",
+    "spectrum_bar": "#0284c7",
+    "spectrum_bg": "#f8fafc",
+    "wave_bg": "#ffffff",
+    "wave_grid": "#f1f5f9",
+    "header_bg": "#ffffff",
+    "footer_bg": "#1e242b",
+    "footer_text": "#94a3b8",
+    "btn_primary_bg": "#0284c7",
+    "btn_primary_fg": "#ffffff",
 }
 
 
@@ -101,8 +68,7 @@ class RadarDesktopApp(tk.Tk):
         self.geometry("1180x820")
         self.minsize(1040, 720)
 
-        self.current_theme_name = "light"
-        self.theme = THEMES[self.current_theme_name]
+        self.theme = THEME
 
         # Telemetry State
         self.motion_score = 0.0
@@ -246,13 +212,6 @@ class RadarDesktopApp(tk.Tk):
             font=("Helvetica", 9, "bold"), relief="flat", padx=10, pady=4, cursor="hand2"
         )
         self.btn_demo.pack(side="left", padx=4)
-
-        self.btn_theme = tk.Button(
-            ctrl_frame, text="◑ THEME", command=self._toggle_theme,
-            bg=self.theme["bg_subtle"], fg=self.theme["text_primary"],
-            font=("Helvetica", 9, "bold"), relief="flat", padx=8, pady=4, cursor="hand2"
-        )
-        self.btn_theme.pack(side="left", padx=4)
 
         # ====================================================================
         # 2. DYNAMIC STATUS & TELEMETRY STRIP
@@ -641,28 +600,6 @@ class RadarDesktopApp(tk.Tk):
             self.beacon_rate = 0.0
             self.beacon_mac = "SEARCHING"
             self._add_log("DEMO: Simulation ended.")
-
-    def _toggle_theme(self):
-        self.current_theme_name = "dark" if self.current_theme_name == "light" else "light"
-        self.theme = THEMES[self.current_theme_name]
-        # Rebuild theme colors on main components
-        self.configure(bg=self.theme["bg_main"])
-        self.header_frame.configure(bg=self.theme["header_bg"], highlightbackground=self.theme["border"])
-        self.lbl_brand_icon.configure(bg=self.theme["header_bg"])
-        self.lbl_title.configure(fg=self.theme["text_primary"], bg=self.theme["header_bg"])
-        self.lbl_sub.configure(fg=self.theme["text_muted"], bg=self.theme["header_bg"])
-        self.radar_card.configure(bg=self.theme["bg_card"], highlightbackground=self.theme["border"])
-        self.spectrum_card.configure(bg=self.theme["bg_card"], highlightbackground=self.theme["border"])
-        self.wave_card.configure(bg=self.theme["bg_card"], highlightbackground=self.theme["border"])
-        self.cal_card.configure(bg=self.theme["bg_card"], highlightbackground=self.theme["border"])
-        self.log_card.configure(bg=self.theme["bg_card"], highlightbackground=self.theme["border"])
-        self.canvas_radar.configure(bg=self.theme["radar_bg"])
-        self.canvas_spectrum.configure(bg=self.theme["spectrum_bg"])
-        self.canvas_wave.configure(bg=self.theme["wave_bg"])
-        self.log_list.configure(bg=self.theme["bg_subtle"], fg=self.theme["text_primary"])
-        self.footer.configure(bg=self.theme["footer_bg"])
-        self.lbl_footer.configure(fg=self.theme["footer_text"], bg=self.theme["footer_bg"])
-        self.lbl_copy.configure(fg=self.theme["footer_text"], bg=self.theme["footer_bg"])
 
     # ====================================================================
     # 4. MAIN ANIMATION & CANVAS RENDERING (25 FPS)

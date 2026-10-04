@@ -292,28 +292,10 @@ const THEME_PALETTES = {
 };
 
 function getThemePalette() {
-  return THEME_PALETTES[currentTheme] || THEME_PALETTES['pure-white'];
+  return THEME_PALETTES['pure-white'];
 }
 
-// ---------------------------------------------------------------------------
-// Theme Management Engine
-// ---------------------------------------------------------------------------
-function applyTheme(themeName) {
-  if (!THEME_PALETTES[themeName]) themeName = 'pure-white';
-  currentTheme = themeName;
-  document.body.setAttribute('data-theme', themeName);
-  localStorage.setItem('radar_theme', themeName);
-  if (themeSelector) themeSelector.value = themeName;
-}
-
-if (themeSelector) {
-  themeSelector.value = currentTheme;
-  themeSelector.addEventListener('change', (e) => {
-    applyTheme(e.target.value);
-    addLogEntry('INFO', 'THEME', `Color theme switched to ${e.target.selectedOptions[0].text}`);
-  });
-}
-applyTheme(currentTheme);
+document.body.setAttribute('data-theme', 'pure-white');
 
 // ---------------------------------------------------------------------------
 // Audio Synthesizer

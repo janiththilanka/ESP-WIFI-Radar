@@ -4,7 +4,7 @@
 [![Platform](https://img.shields.io/badge/Platform-ESP32%20%7C%20ESP8266-red.svg)](https://www.espressif.com/)
 [![Protocol](https://img.shields.io/badge/Protocol-ESP--NOW%20%7C%20802.11n%20CSI-orange.svg)](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html#wi-fi-channel-state-information)
 [![Display](https://img.shields.io/badge/Display-20x4%20I2C%20LCD-blueviolet.svg)](https://github.com/bperrybap/hd44780)
-[![Console](https://img.shields.io/badge/GUI-WebSerial%20Cockpit%20(8%20Themes)-brightgreen.svg)](gui/index.html)
+[![Console](https://img.shields.io/badge/GUI-WebSerial%20Cockpit-brightgreen.svg)](gui/index.html)
 [![Hardware Verified](https://img.shields.io/badge/Hardware-Tested%20%26%20Verified-success.svg)](#-live-hardware-telemetry-gallery)
 
 An **RF Multipath & CSI (Channel State Information) Wi-Fi Radar** built with **one ESP8266** and **one ESP32**, engineered according to state-of-the-art research from **Espressif esp-csi**, **ESPectre**, and **WaveSight**.
@@ -48,7 +48,6 @@ The radar features a 100% standalone **20x4 I2C LCD Telemetry Display** running 
 
 ### 💻 5. Next-Gen WebSerial Tactical Console (`gui/index.html`)
 - Zero installation: Runs natively in Google Chrome, Edge, Brave, and Opera via the HTML5 WebSerial API.
-- **8 Curated Themes**: Yellow VMS, Nordic Slate, Swiss Clean, Tactical Dark, Cyber Emerald, Deep Space, Solar Amber, and Cyberpunk Neon.
 - **Interactive Visualizers**: 52-channel OFDM waterfall heatmap, live disturbance oscilloscope, and subcarrier jitter spectrum analyzer.
 - **Precision DSP Calibrator**: Live tactile tuning of sensitivity multipliers, noise offset margin, pre-amp gain, debounce frames, and 4 quick-preset profiles.
 
@@ -204,15 +203,6 @@ Open [`gui/index.html`](gui/index.html) directly in any Chromium-based browser (
   <kbd><img src="docs/images/lcd_room_secure.jpg" width="80%" alt="Radar Console" /></kbd>
 </p>
 
-- **8 Curated Aesthetic Themes:**
-  - ☀️ **Yellow VMS** (Scandinavian high-contrast security architecture)
-  - ❄️ **Nordic Slate** (Cool steel telemetry console)
-  - 🏢 **Swiss Clean** (Minimalist laboratory monochrome with signal red calipers)
-  - 🌙 **Tactical Dark** (Stealth obsidian void with neon cyan phosphor)
-  - ⚡ **Cyber Emerald** (CRT military radar phosphor matrix)
-  - 🌌 **Deep Space** (NASA/SpaceX aerospace telemetry)
-  - 🌅 **Solar Amber** (Industrial hazard and safety console)
-  - 🌆 **Cyberpunk Neon** (Retrowave sunset synthwave)
 - **Fullscreen Cockpit Mode (`⛶`):** One-click toggle for full-screen landscape operation.
 - **Real-Time Visualizers:**
   - 20 MHz 802.11n Wi-Fi OFDM Subcarrier Waterfall Heatmap.
