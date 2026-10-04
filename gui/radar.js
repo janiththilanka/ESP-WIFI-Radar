@@ -69,6 +69,7 @@ const kpiRssi = document.getElementById('kpi-rssi');
 const kpiRssiBar = document.getElementById('kpi-rssi-bar');
 const kpiRssiQuality = document.getElementById('kpi-rssi-quality');
 const kpiRate = document.getElementById('kpi-rate');
+const kpiRateBar = document.getElementById('kpi-rate-bar');
 const kpiBaselineText = document.getElementById('kpi-baseline-text');
 
 const calBanner = document.getElementById('cal-banner');
@@ -115,10 +116,10 @@ const THEME_PALETTES = {
   'axis-light': {
     isLight: true,
     canvasBg: '#ffffff',
-    gridColor: '#f1f5f9',
-    waveNormal: '#0284c7',
+    gridColor: '#e4e4e7',
+    waveNormal: '#2563eb',
     waveAlert: '#dc2626',
-    threshColor: '#ea580c',
+    threshColor: '#d97706',
     baselineColor: 'rgba(220, 38, 38, 0.45)',
     glow: false,
     colorMap: (norm) => {
@@ -137,10 +138,10 @@ const THEME_PALETTES = {
   'nordic-slate': {
     isLight: true,
     canvasBg: '#f8fafc',
-    gridColor: '#e2e8f0',
-    waveNormal: '#2563eb',
+    gridColor: '#c5d5e8',
+    waveNormal: '#1d4ed8',
     waveAlert: '#dc2626',
-    threshColor: '#d97706',
+    threshColor: '#b45309',
     baselineColor: 'rgba(220, 38, 38, 0.45)',
     glow: false,
     colorMap: (norm) => {
@@ -159,132 +160,132 @@ const THEME_PALETTES = {
   'swiss-clean': {
     isLight: true,
     canvasBg: '#ffffff',
-    gridColor: '#e5e5e5',
-    waveNormal: '#0a0a0a',
+    gridColor: '#cbd5e1',
+    waveNormal: '#0284c7',
     waveAlert: '#dc2626',
-    threshColor: '#737373',
-    baselineColor: 'rgba(220, 38, 38, 0.5)',
+    threshColor: '#ca8a04',
+    baselineColor: 'rgba(220, 38, 38, 0.45)',
     glow: false,
     colorMap: (norm) => {
       if (norm < 0.25) {
         const t = norm / 0.25;
-        return [Math.round(240 - 40 * t), Math.round(240 - 40 * t), Math.round(240 - 40 * t)];
+        return [Math.round(240 - 20 * t), Math.round(245 - 15 * t), Math.round(250 - 5 * t)];
       } else if (norm < 0.65) {
         const t = (norm - 0.25) / 0.40;
-        return [Math.round(200 - 150 * t), Math.round(200 - 150 * t), Math.round(200 - 150 * t)];
+        return [Math.round(2 + 200 * t), Math.round(132 + 20 * t), Math.round(199 - 180 * t)];
       } else {
         const t = (norm - 0.65) / 0.35;
-        return [Math.round(50 + 170 * t), Math.round(50 - 12 * t), Math.round(50 - 12 * t)];
+        return [Math.round(220), Math.round(38), Math.round(38)];
       }
     }
   },
   'dark': {
     isLight: false,
-    canvasBg: '#06090e',
+    canvasBg: '#0f0f0f',
     gridColor: 'rgba(255, 255, 255, 0.05)',
-    waveNormal: '#00e5ff',
-    waveAlert: '#ff1744',
-    threshColor: '#ff9100',
-    baselineColor: 'rgba(255, 23, 68, 0.45)',
+    waveNormal: '#60a5fa',
+    waveAlert: '#f87171',
+    threshColor: '#fbbf24',
+    baselineColor: 'rgba(248, 113, 113, 0.45)',
     glow: true,
     colorMap: (norm) => {
       if (norm < 0.25) {
         const t = norm / 0.25;
-        return [Math.round(6 * (1 - t) + 0 * t), Math.round(15 * (1 - t) + 229 * t), Math.round(30 * (1 - t) + 255 * t)];
+        return [Math.round(15 + 40 * t), Math.round(15 + 80 * t), Math.round(15 + 160 * t)];
       } else if (norm < 0.65) {
         const t = (norm - 0.25) / 0.40;
-        return [Math.round(0 * (1 - t) + 255 * t), Math.round(229 * (1 - t) + 145 * t), Math.round(255 * (1 - t) + 0 * t)];
+        return [Math.round(55 + 195 * t), Math.round(95 + 96 * t), Math.round(175 - 139 * t)];
       } else {
         const t = (norm - 0.65) / 0.35;
-        return [255, Math.round(145 * (1 - t) + 23 * t), Math.round(0 * (1 - t) + 68 * t)];
+        return [Math.round(248), Math.round(113 - 40 * t), Math.round(113 - 40 * t)];
       }
     }
   },
   'cyber-emerald': {
     isLight: false,
-    canvasBg: '#020503',
-    gridColor: 'rgba(16, 185, 129, 0.08)',
-    waveNormal: '#00ff7f',
-    waveAlert: '#ff3344',
-    threshColor: '#34d399',
-    baselineColor: 'rgba(255, 51, 68, 0.45)',
-    glow: true,
-    colorMap: (norm) => {
-      if (norm < 0.25) {
-        const t = norm / 0.25;
-        return [Math.round(2 * (1 - t) + 16 * t), Math.round(8 * (1 - t) + 185 * t), Math.round(4 * (1 - t) + 129 * t)];
-      } else if (norm < 0.65) {
-        const t = (norm - 0.25) / 0.40;
-        return [Math.round(16 * (1 - t) + 0 * t), Math.round(185 * (1 - t) + 255 * t), Math.round(129 * (1 - t) + 127 * t)];
-      } else {
-        const t = (norm - 0.65) / 0.35;
-        return [Math.round(0 * (1 - t) + 230 * t), 255, Math.round(127 * (1 - t) + 250 * t)];
-      }
-    }
-  },
-  'deep-space': {
-    isLight: false,
-    canvasBg: '#040812',
-    gridColor: 'rgba(59, 130, 246, 0.08)',
+    canvasBg: '#050b14',
+    gridColor: 'rgba(56, 189, 248, 0.08)',
     waveNormal: '#38bdf8',
     waveAlert: '#f43f5e',
-    threshColor: '#60a5fa',
+    threshColor: '#fbbf24',
     baselineColor: 'rgba(244, 63, 94, 0.45)',
     glow: true,
     colorMap: (norm) => {
       if (norm < 0.25) {
         const t = norm / 0.25;
-        return [Math.round(4 * (1 - t) + 56 * t), Math.round(8 * (1 - t) + 189 * t), Math.round(18 * (1 - t) + 248 * t)];
+        return [Math.round(5 + 20 * t), Math.round(11 + 60 * t), Math.round(20 + 160 * t)];
       } else if (norm < 0.65) {
         const t = (norm - 0.25) / 0.40;
-        return [Math.round(56 * (1 - t) + 96 * t), Math.round(189 * (1 - t) + 165 * t), Math.round(248 * (1 - t) + 250 * t)];
+        return [Math.round(25 + 31 * t), Math.round(71 + 118 * t), Math.round(180 + 68 * t)];
       } else {
         const t = (norm - 0.65) / 0.35;
-        return [Math.round(96 * (1 - t) + 244 * t), Math.round(165 * (1 - t) + 63 * t), Math.round(250 * (1 - t) + 94 * t)];
+        return [Math.round(56 + 188 * t), Math.round(189 - 126 * t), Math.round(248 - 154 * t)];
+      }
+    }
+  },
+  'deep-space': {
+    isLight: true,
+    canvasBg: '#f4fbf6',
+    gridColor: '#c5ddc9',
+    waveNormal: '#16a34a',
+    waveAlert: '#dc2626',
+    threshColor: '#ca8a04',
+    baselineColor: 'rgba(220, 38, 38, 0.45)',
+    glow: false,
+    colorMap: (norm) => {
+      if (norm < 0.25) {
+        const t = norm / 0.25;
+        return [Math.round(230 + 10 * t), Math.round(245 + 5 * t), Math.round(235 - 5 * t)];
+      } else if (norm < 0.65) {
+        const t = (norm - 0.25) / 0.40;
+        return [Math.round(240 - 218 * t), Math.round(250 - 87 * t), Math.round(230 - 156 * t)];
+      } else {
+        const t = (norm - 0.65) / 0.35;
+        return [Math.round(22 + 198 * t), Math.round(163 - 125 * t), Math.round(74 - 36 * t)];
       }
     }
   },
   'solar-amber': {
-    isLight: false,
-    canvasBg: '#120f0d',
-    gridColor: 'rgba(245, 158, 11, 0.08)',
-    waveNormal: '#f59e0b',
-    waveAlert: '#ea580c',
-    threshColor: '#fbbf24',
-    baselineColor: 'rgba(234, 88, 12, 0.45)',
-    glow: true,
+    isLight: true,
+    canvasBg: '#fdf6ec',
+    gridColor: '#ddd0b8',
+    waveNormal: '#d97706',
+    waveAlert: '#dc2626',
+    threshColor: '#92400e',
+    baselineColor: 'rgba(220, 38, 38, 0.45)',
+    glow: false,
     colorMap: (norm) => {
       if (norm < 0.25) {
         const t = norm / 0.25;
-        return [Math.round(18 * (1 - t) + 245 * t), Math.round(15 * (1 - t) + 158 * t), Math.round(13 * (1 - t) + 11 * t)];
+        return [Math.round(250), Math.round(245 - 20 * t), Math.round(230 - 30 * t)];
       } else if (norm < 0.65) {
         const t = (norm - 0.25) / 0.40;
-        return [245, Math.round(158 * (1 - t) + 191 * t), Math.round(11 * (1 - t) + 36 * t)];
+        return [Math.round(250 - 33 * t), Math.round(225 - 106 * t), Math.round(200 - 194 * t)];
       } else {
         const t = (norm - 0.65) / 0.35;
-        return [Math.round(245 - 11 * t), Math.round(191 - 103 * t), Math.round(36 - 24 * t)];
+        return [Math.round(217 + 3 * t), Math.round(119 - 81 * t), Math.round(6 + 32 * t)];
       }
     }
   },
   'cyberpunk': {
     isLight: false,
-    canvasBg: '#06020a',
+    canvasBg: '#060210',
     gridColor: 'rgba(168, 85, 247, 0.09)',
-    waveNormal: '#06b6d4',
-    waveAlert: '#ff0055',
-    threshColor: '#f43f5e',
-    baselineColor: 'rgba(255, 0, 85, 0.45)',
+    waveNormal: '#22d3ee',
+    waveAlert: '#fb7185',
+    threshColor: '#c084fc',
+    baselineColor: 'rgba(251, 113, 133, 0.45)',
     glow: true,
     colorMap: (norm) => {
       if (norm < 0.25) {
         const t = norm / 0.25;
-        return [Math.round(10 * (1 - t) + 6 * t), Math.round(3 * (1 - t) + 182 * t), Math.round(20 * (1 - t) + 212 * t)];
+        return [Math.round(6 + 28 * t), Math.round(2 + 16 * t), Math.round(16 + 80 * t)];
       } else if (norm < 0.65) {
         const t = (norm - 0.25) / 0.40;
-        return [Math.round(6 * (1 - t) + 168 * t), Math.round(182 * (1 - t) + 85 * t), Math.round(212 * (1 - t) + 247 * t)];
+        return [Math.round(34 + 158 * t), Math.round(18 + 114 * t), Math.round(96 + 156 * t)];
       } else {
         const t = (norm - 0.65) / 0.35;
-        return [Math.round(168 * (1 - t) + 244 * t), Math.round(85 * (1 - t) + 63 * t), Math.round(247 * (1 - t) + 94 * t)];
+        return [Math.round(192 + 59 * t), Math.round(132 - 19 * t), Math.round(252 - 119 * t)];
       }
     }
   }
@@ -497,6 +498,19 @@ if (sliderHold) {
 function parseTelemetry(line) {
   if (!line || !line.trim()) return;
 
+  if (line.includes('[CAL_START]')) {
+    startCalibrationUI();
+    addLogEntry('CAL', 'CALIBRATING', 'ESP32 started ambient RF baseline sampling.');
+    return;
+  }
+  if (line.includes('[CAL_COMPLETE]')) {
+    finishCalibrationUI();
+    const parts = line.split(':');
+    const newBase = parts.length > 1 ? parts[1].trim() : '';
+    addLogEntry('CAL', 'CALIBRATED', `Baseline established at ${newBase}`);
+    return;
+  }
+
   const parts = line.split(/\s+/);
   parts.forEach(p => {
     const [k, v] = p.split(':');
@@ -526,11 +540,11 @@ function updateUI() {
     if (isBeaconOnline) {
       beaconPill.className = 'beacon-pill online';
       beaconStatusText.textContent = 'ESP8266 BEACON: ONLINE';
-      beaconStatsText.textContent = `${beaconRssi} dBm | ${beaconRate} PPS | MAC: ${beaconMac}`;
+      beaconStatsText.textContent = `${beaconRssi} dBm · ${beaconRate} PPS · ${beaconMac}`;
     } else {
       beaconPill.className = 'beacon-pill offline';
-      beaconStatusText.textContent = 'ESP8266 BEACON: OFFLINE / UNPOWERED';
-      beaconStatsText.textContent = 'No RF pulses received. Check power in Corner 1!';
+      beaconStatusText.textContent = 'ESP8266 BEACON: OFFLINE';
+      beaconStatsText.textContent = 'No RF pulses received. Check power!';
     }
   }
 
@@ -539,30 +553,30 @@ function updateUI() {
 
   if (mainStatusBanner) {
     if (!isBeaconOnline) {
-      mainStatusBanner.className = 'status-ambient-strip status-banner warning';
+      mainStatusBanner.className = 'status-strip warning';
       if (mainStatusIcon) mainStatusIcon.textContent = '⚠️';
       if (mainStatusHeadline) mainStatusHeadline.textContent = 'BEACON TRANSMITTER OFFLINE';
-      if (mainStatusSub) mainStatusSub.textContent = 'ESP32 is waiting for 2.4 GHz pulses. Ensure the ESP8266 in Corner 1 is plugged into 5V power.';
+      if (mainStatusSub) mainStatusSub.textContent = 'ESP32 waiting for 2.4 GHz pulses. Ensure ESP8266 in Corner 1 is powered.';
     } else if (currentAlert > 0) {
-      mainStatusBanner.className = 'status-ambient-strip status-banner intrusion';
+      mainStatusBanner.className = 'status-strip intrusion';
       if (mainStatusIcon) mainStatusIcon.textContent = '🚨';
-      if (mainStatusHeadline) mainStatusHeadline.textContent = 'INTRUSION DETECTED // FRESNEL ZONE VIOLATION';
-      if (mainStatusSub) mainStatusSub.textContent = `RF perturbation score (${currentMotion.toFixed(1)}) breached threshold (${currentThreshold.toFixed(1)}). Active movement in room!`;
+      if (mainStatusHeadline) mainStatusHeadline.textContent = 'INTRUSION DETECTED — FRESNEL ZONE VIOLATION';
+      if (mainStatusSub) mainStatusSub.textContent = `RF perturbation (${currentMotion.toFixed(1)}) breached threshold (${currentThreshold.toFixed(1)}). Active movement detected!`;
 
       if (prevAlertState === 0) {
-        addLogEntry('ALERT', 'INTRUSION', `Target movement triggered alert. Score: ${currentMotion.toFixed(1)} (Threshold: ${currentThreshold.toFixed(1)})`);
+        addLogEntry('ALERT', 'INTRUSION', `Movement triggered alert. Score: ${currentMotion.toFixed(1)} (Threshold: ${currentThreshold.toFixed(1)})`);
         playAlarmSound(true);
       }
     } else if (currentMotion > currentBaseline * 1.3) {
-      mainStatusBanner.className = 'status-ambient-strip status-banner warning';
+      mainStatusBanner.className = 'status-strip warning';
       if (mainStatusIcon) mainStatusIcon.textContent = '🚶';
       if (mainStatusHeadline) mainStatusHeadline.textContent = 'MICRO-MOVEMENT / PRESENCE DETECTED';
-      if (mainStatusSub) mainStatusSub.textContent = 'Subtle Doppler shifts detected. Target presence or micro-motion detected below alert limit.';
+      if (mainStatusSub) mainStatusSub.textContent = 'Subtle Doppler shifts detected. Target presence or micro-motion below alert limit.';
     } else {
-      mainStatusBanner.className = 'status-ambient-strip status-banner secure';
+      mainStatusBanner.className = 'status-strip secure';
       if (mainStatusIcon) mainStatusIcon.textContent = '🛡️';
-      if (mainStatusHeadline) mainStatusHeadline.textContent = 'ROOM SECURE // ZERO ANOMALIES';
-      if (mainStatusSub) mainStatusSub.textContent = `RF multipath reflections are stationary. Baseline noise floor: ${currentBaseline.toFixed(2)}`;
+      if (mainStatusHeadline) mainStatusHeadline.textContent = 'ROOM SECURE — ZERO ANOMALIES';
+      if (mainStatusSub) mainStatusSub.textContent = `RF multipath reflections stationary. Baseline noise floor: ${currentBaseline.toFixed(2)}`;
     }
   }
   prevAlertState = currentAlert;
@@ -572,7 +586,7 @@ function updateUI() {
   const motionPct = Math.min(100, (currentMotion / maxScale) * 100);
   if (kpiMotionBar) {
     kpiMotionBar.style.width = `${motionPct}%`;
-    kpiMotionBar.style.backgroundColor = (currentAlert > 0) ? 'var(--accent-red)' : 'var(--accent-blue)';
+    kpiMotionBar.style.backgroundColor = (currentAlert > 0) ? 'var(--c-red)' : 'var(--c-blue)';
   }
   if (kpiMotionTrend) kpiMotionTrend.textContent = (currentAlert > 0) ? '⚠️ Intruding Target' : 'Normal Fluctuations';
 
@@ -585,7 +599,10 @@ function updateUI() {
 
   if (kpiRssi) kpiRssi.textContent = `${beaconRssi}`;
   const rssiPct = Math.min(100, Math.max(0, ((beaconRssi + 95) / 55) * 100));
-  if (kpiRssiBar) kpiRssiBar.style.width = `${rssiPct}%`;
+  if (kpiRssiBar) {
+    kpiRssiBar.style.width = `${rssiPct}%`;
+    kpiRssiBar.style.backgroundColor = (beaconRssi > -68) ? 'var(--c-green)' : (beaconRssi > -82) ? 'var(--c-amber)' : 'var(--c-red)';
+  }
   if (kpiRssiQuality) {
     if (beaconRssi > -65) kpiRssiQuality.textContent = 'Signal: Excellent (Strong LoS)';
     else if (beaconRssi > -80) kpiRssiQuality.textContent = 'Signal: Good (Corner Coverage)';
@@ -593,6 +610,10 @@ function updateUI() {
   }
 
   if (kpiRate) kpiRate.textContent = `${beaconRate} PPS`;
+  if (kpiRateBar) {
+    const ratePct = Math.min(100, Math.max(0, (beaconRate / 45) * 100));
+    kpiRateBar.style.width = `${ratePct}%`;
+  }
   if (kpiBaselineText) kpiBaselineText.textContent = `Baseline Noise: ${currentBaseline.toFixed(2)}`;
 
   motionHistory.push(currentMotion);
@@ -800,12 +821,10 @@ async function connectSerial() {
 
     isConnected = true;
     isDemoMode = false;
-    if (btnDemoLabel) btnDemoLabel.textContent = "Demo Mode";
-    if (btnDemo) btnDemo.classList.remove('active');
 
     btnConnectLabel.textContent = "Disconnect";
     btnConnect.classList.add('connected');
-    footerDot.className = "footer-pulse-dot active";
+    footerDot.className = "footer-dot active";
     footerText.textContent = "SERIAL PORT: CONNECTED (115200 BAUD)";
     addLogEntry('INFO', 'CONNECTED', 'Serial link opened with ESP32 receiver on COM port.');
 
@@ -853,7 +872,7 @@ async function disconnectSerial() {
 
   btnConnectLabel.textContent = "Connect ESP32";
   btnConnect.classList.remove('connected');
-  footerDot.className = "footer-pulse-dot";
+  footerDot.className = "footer-dot";
   footerText.textContent = "SERIAL PORT: NOT CONNECTED";
   isBeaconOnline = false;
   updateUI();
@@ -864,12 +883,13 @@ if (btnConnect) btnConnect.addEventListener('click', connectSerial);
 
 if (btnCalibrate) {
   btnCalibrate.addEventListener('click', () => {
+    startCalibrationUI();
     if (isConnected) {
       sendCommand('CMD:CAL');
+      addLogEntry('CAL', 'CALIBRATE', 'Sent baseline calibration request to ESP32.');
     } else {
-      startCalibrationUI();
       setTimeout(finishCalibrationUI, 5000);
-      addLogEntry('CAL', 'CALIBRATE', 'Ambient RF noise floor calibrated.');
+      addLogEntry('CAL', 'CALIBRATE', 'Ambient RF noise floor calibrated (offline).');
     }
   });
 }
@@ -944,6 +964,29 @@ document.addEventListener('fullscreenchange', updateFullscreenUI);
 document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
 document.addEventListener('mozfullscreenchange', updateFullscreenUI);
 document.addEventListener('MSFullscreenChange', updateFullscreenUI);
+
+// ---------------------------------------------------------------------------
+// Canvas DPI and Dynamic Width Sizing
+// ---------------------------------------------------------------------------
+function resizeCanvases() {
+  const list = [
+    { canvas: spectrogramCanvas },
+    { canvas: waveformCanvas },
+    { canvas: spectrumCanvas }
+  ];
+
+  list.forEach(({ canvas }) => {
+    if (!canvas || !canvas.parentElement) return;
+    const w = canvas.parentElement.clientWidth;
+    if (w > 50 && Math.abs(canvas.width - w) > 4) {
+      canvas.width = w;
+    }
+  });
+}
+
+window.addEventListener('resize', resizeCanvases);
+window.addEventListener('load', resizeCanvases);
+setTimeout(resizeCanvases, 100);
 
 // Start loop
 requestAnimationFrame(renderLoop);
