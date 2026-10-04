@@ -53,14 +53,60 @@ For full mathematical derivations and academic citations, see [**`docs/RESEARCH_
 
 - **1 × ESP8266** (NodeMCU, Wemos D1 Mini, ESP-01, or any generic board)
 - **1 × ESP32** (ESP32 DevKit v1, NodeMCU-32S, ESP32-WROOM-32, etc.)
+- **1 × 20x4 LCD with I2C Backpack (PCF8574)** *(Optional but highly recommended for standalone telemetry)*
+- **4 × Female-to-Female Jumper Wires** (for I2C LCD connection)
 - **2 × Micro-USB / USB-C cables** (or 5V USB power adapters)
 - *Optional:* Piezo buzzer or external LED connected to ESP32 **GPIO 2**
 
 ---
 
+## 📟 Standalone 20x4 I2C LCD Telemetry Monitor
+
+The ESP32 receiver includes native driver support for **20x4 character LCDs** via I2C (using the industry-standard `hd44780` library by Bill Perry). It automatically probes the bus, detects the backpack address (`0x27` or `0x3F`), and displays real-time radar telemetry completely independently from the PC or web dashboard.
+
+<p align="center">
+  <img src="docs/images/lcd_room_secure.jpg" width="48%" alt="Room Secure Status on 20x4 LCD" />
+  <img src="docs/images/lcd_micro_motion.jpg" width="48%" alt="Micro-Motion Detected on 20x4 LCD" />
+</p>
+
+### 🔌 Wiring Diagram
+
+| 20x4 I2C LCD Pin | ESP32 Pin | Function | Notes |
+| :--- | :--- | :--- | :--- |
+| **VCC** | **VIN (5V)** | Power Supply | **Must connect to 5V/VIN** for optical contrast (3.3V is too low) |
+| **GND** | **GND** | Ground | Common system ground |
+| **SDA** | **GPIO 21 (G21)** | I2C Data | Default ESP32 hardware I2C data |
+| **SCL** | **GPIO 22 (G22)** | I2C Clock | Default ESP32 hardware I2C clock (100 kHz) |
+
+### 📋 LCD Screen Layout (4 Lines)
+
+```text
++--------------------+
+|STATUS: ROOM SECURE |  <-- Line 0: Real-time System State
+|MOT:  1.9  LIM: 10.0|  <-- Line 1: Live Motion Energy vs Dynamic Threshold Limit
+|BCN: ONLINE  -60 dBm|  <-- Line 2: ESP8266 Transmitter Status & RSSI
+|RATE: 34PPS  FLR:2.5|  <-- Line 3: Packet Rate (PPS) & Ambient Noise Floor
++--------------------+
+```
+
+- **Line 0 (System State):**
+  - `STATUS: ROOM SECURE` — Ambient room is calm; no motion detected.
+  - `STATUS: MICRO-MOTION` — Slight perturbation detected (breathing, subtle movement).
+  - `! INTRUSION ALERT !` — Energy crossed the dynamic threshold; active movement alert!
+  - `STATUS: BCN OFFLINE ` — Transmitter beacon signal lost or out of range.
+- **Line 1 (`MOT` & `LIM`):** Instantaneous filtered motion energy score vs. current dynamic trigger limit.
+- **Line 2 (`BCN` & RSSI):** Health of the ESP8266 radio link and physical received signal strength in dBm.
+- **Line 3 (`RATE` & `FLR`):** Real-time CSI packet arrival rate (packets per second) and the adaptive ambient noise floor.
+
+> **💡 Hardware Tip:**
+> - If characters appear faint or invisible, adjust the small **blue contrast potentiometer** on the back of the I2C module using a small screwdriver until characters appear crisp.
+> - Ensure the 2-pin black jumper cap labeled **`LED`** on the back of the module is firmly seated to supply backlight power.
+
+---
+
 ## 🚀 Quick Setup & Flashing Guide
 
-### Step 1: Install Board Cores in Arduino IDE
+### Step 1: Install Board Cores & Libraries in Arduino IDE
 1. Open **Arduino IDE**.
 2. Go to **File -> Preferences** and add the board manager URLs:
    ```text
@@ -70,6 +116,8 @@ For full mathematical derivations and academic citations, see [**`docs/RESEARCH_
 3. Go to **Tools -> Board -> Boards Manager...**:
    - Search for **esp32** by *Espressif Systems* and click **Install**.
    - Search for **esp8266** by *ESP8266 Community* and click **Install**.
+4. Go to **Sketch -> Include Library -> Manage Libraries...**:
+   - Search for **`hd44780`** by *Bill Perry* and click **Install** (required for the I2C LCD).
 
 ---
 
