@@ -13,7 +13,7 @@
 
 /* 1. Pure White (default) */
 :root,
-[data-theme="axis-light"] {
+[data-theme="pure-white"] {
   --c-bg:        #f7f7f8;
   --c-surface:   #ffffff;
   --c-raised:    #ffffff;

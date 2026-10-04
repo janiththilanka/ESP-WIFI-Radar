@@ -1,7 +1,7 @@
 /*
  =====================================================================================
   Wi-Fi CSI RF Sensing Station - Advanced Detection Dashboard Engine (v2.6)
-  Dynamic Theme Engine (Axis Light / Tactical Dark / Nordic Slate)
+  Dynamic Theme Engine (Pure White / Tactical Dark / Nordic Slate)
  =====================================================================================
 */
 
@@ -14,7 +14,7 @@ let isDemoMode = false;
 let isAudioEnabled = true;
 
 // Active Theme State
-let currentTheme = localStorage.getItem('radar_theme') || 'axis-light';
+let currentTheme = localStorage.getItem('radar_theme') || 'pure-white';
 
 // Telemetry State
 let currentMotion = 0.0;
@@ -113,7 +113,7 @@ const barCtx = spectrumCanvas ? spectrumCanvas.getContext('2d') : null;
 // Dynamic Multi-Theme Canvas Palettes Engine
 // ---------------------------------------------------------------------------
 const THEME_PALETTES = {
-  'axis-light': {
+  'pure-white': {
     isLight: true,
     canvasBg: '#ffffff',
     gridColor: '#e4e4e7',
@@ -292,14 +292,14 @@ const THEME_PALETTES = {
 };
 
 function getThemePalette() {
-  return THEME_PALETTES[currentTheme] || THEME_PALETTES['axis-light'];
+  return THEME_PALETTES[currentTheme] || THEME_PALETTES['pure-white'];
 }
 
 // ---------------------------------------------------------------------------
 // Theme Management Engine
 // ---------------------------------------------------------------------------
 function applyTheme(themeName) {
-  if (!THEME_PALETTES[themeName]) themeName = 'axis-light';
+  if (!THEME_PALETTES[themeName]) themeName = 'pure-white';
   currentTheme = themeName;
   document.body.setAttribute('data-theme', themeName);
   localStorage.setItem('radar_theme', themeName);
