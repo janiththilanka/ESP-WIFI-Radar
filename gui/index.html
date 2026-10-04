@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RF·CSI Laboratory Console - Multipath Sensing Deck</title>
+
+  <!-- Next-Gen Typography: Outfit (Display) + Plus Jakarta Sans (UI) + JetBrains Mono (Telemetry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-theme" data-theme="axis-light">
+
+  <!-- Floating Command Bar -->
+  <header class="console-nav-wrap">
+    <nav class="console-nav">
+      <!-- Brand & Station Identity -->
+      <div class="brand-capsule">
+        <div class="brand-orb">📡</div>
+        <div class="brand-text-block">
+          <div class="brand-heading">
+            RF·CSI SENSING DECK
+            <span class="brand-badge">OFDM MATRIX</span>
+          </div>
+          <span class="brand-subtext">2.4 GHz Multipath Scattering & Fresnel Radar Console // ESP32+ESP8266</span>
+        </div>
+      </div>
+
+      <!-- Live Beacon Link Quality Capsule -->
+      <div class="beacon-pill" id="beacon-pill">
+        <div class="beacon-dot" id="beacon-dot"></div>
+        <div class="beacon-info">
+          <span class="beacon-label" id="beacon-status-text">BEACON: SEARCHING...</span>
+          <span class="beacon-stats" id="beacon-stats-text">-- dBm | 0 PPS | MAC: --:--:--:--:--:--</span>
+        </div>
+      </div>
+
+      <!-- Tactical Control Cluster -->
+      <div class="nav-actions">
+        <!-- Modern Theme Switcher -->
+        <div class="theme-switch-pill" title="Change Console Visual Theme">
+          <span>🎨</span>
+          <select id="theme-selector" class="theme-dropdown" aria-label="Console Visual Theme">
+            <option value="axis-light">☀️Yellow VMS</option>
+            <option value="nordic-slate">❄️ Nordic Slate</option>
+            <option value="swiss-clean">🏢 Swiss Clean</option>
+            <option value="dark">🌙 Tactical Dark</option>
+            <option value="cyber-emerald">⚡ Cyber Emerald</option>
+            <option value="deep-space">🌌 Deep Space</option>
+            <option value="solar-amber">🌅 Solar Amber</option>
+            <option value="cyberpunk">🌆 Cyberpunk Neon</option>
+          </select>
+        </div>
+
+        <button id="btn-calibrate" class="tactile-btn" title="Calibrate ambient RF noise baseline">
+          <span>🎯</span>
+          <span id="btn-calibrate-label">Calibrate</span>
+        </button>
+
+        <button id="btn-connect" class="tactile-btn btn-connect" title="Connect to ESP32 via USB Serial COM Port">
+          <span>⚡</span>
+          <span id="btn-connect-label">Connect ESP32</span>
+        </button>
+
+        <button id="btn-audio" class="tactile-btn btn-icon-only active" title="Toggle Audio Alarm">
+          <span id="audio-icon">🔊</span>
+        </button>
+
+        <button id="btn-fullscreen" class="tactile-btn btn-icon-only" title="Toggle Fullscreen Display (F11)">
+          <span id="fullscreen-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+            </svg>
+          </span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Auto-Calibration Slide-down Progress Banner -->
+  <div id="cal-banner" class="cal-banner hidden">
+    <div class="cal-banner-content">
+      <span>🎯 CALIBRATING AMBIENT RF BASELINE — KEEP MONITORED FIELD EMPTY</span>
+      <span id="cal-countdown" class="cal-countdown">5s</span>
+    </div>
+    <div class="cal-progress-track">
+      <div id="cal-progress-bar" class="cal-progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Main Console Body (Bento Instrument Matrix) -->
+  <main class="console-body">
+
+    <!-- Top Ambient Status Strip -->
+    <section class="status-ambient-strip secure" id="main-status-banner">
+      <div class="status-strip-left">
+        <div class="status-halo-orb">
+          <span id="main-status-icon">🛡️</span>
+        </div>
+        <div>
+          <h2 class="status-headline" id="main-status-headline">ROOM SECURE // ZERO ANOMALIES</h2>
+          <p class="status-sub" id="main-status-sub">Fresnel reflection matrix is stationary. RF perturbation within
+            ambient noise limit.</p>
+        </div>
+      </div>
+      <div class="status-strip-right">
+        <div class="telemetry-chip">
+          <span class="chip-caption">Perturbation</span>
+          <span class="chip-value score" id="banner-motion-val">0.00</span>
+        </div>
+        <div class="telemetry-chip">
+          <span class="chip-caption">Dynamic Limit</span>
+          <span class="chip-value limit" id="banner-threshold-val">12.00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento Row 1: Key Metrics Quartet -->
+    <section class="bento-metrics-row">
+      <!-- 1. Motion Score -->
+      <div class="bento-card">
+        <div class="bento-card-header">
+          <span class="bento-title">Perturbation Score</span>
+          <span class="bento-tag">REALTIME</span>
+        </div>
+        <div class="bento-metric-val cyan" id="kpi-motion-score">0.00</div>
+        <div class="bento-progress-track">
+          <div class="bento-progress-fill cyan" id="kpi-motion-bar"></div>
+        </div>
+        <div class="bento-footer-note">
+          <span id="kpi-motion-trend">Waiting for stream...</span>
+          <span>Δ CSI</span>
+        </div>
+      </div>
+
+      <!-- 2. Dynamic Threshold -->
+      <div class="bento-card">
+        <div class="bento-card-header">
+          <span class="bento-title">Dynamic Threshold</span>
+          <span class="bento-tag">TRIGGER</span>
+        </div>
+        <div class="bento-metric-val amber" id="kpi-threshold">12.00</div>
+        <div class="bento-progress-track">
+          <div class="bento-progress-fill amber" id="kpi-threshold-bar"></div>
+        </div>
+        <div class="bento-footer-note">
+          <span id="kpi-thresh-mode-text">Mode: Auto-Adaptive</span>
+          <span>LIMIT</span>
+        </div>
+      </div>
+
+      <!-- 3. Beacon RSSI -->
+      <div class="bento-card">
+        <div class="bento-card-header">
+          <span class="bento-title">Beacon RSSI Signal</span>
+          <span class="bento-tag">CARRIER</span>
+        </div>
+        <div class="bento-metric-val green" id="kpi-rssi">-70</div>
+        <div class="bento-progress-track">
+          <div class="bento-progress-fill green" id="kpi-rssi-bar"></div>
+        </div>
+        <div class="bento-footer-note">
+          <span id="kpi-rssi-quality">Signal: Good</span>
+          <span>dBm</span>
+        </div>
+      </div>
+
+      <!-- 4. Pulse Rate & Baseline -->
+      <div class="bento-card">
+        <div class="bento-card-header">
+          <span class="bento-title">Packet Rate & Noise</span>
+          <span class="bento-tag">HEALTH</span>
+        </div>
+        <div class="bento-metric-val" id="kpi-rate">33 PPS</div>
+        <div class="bento-progress-track">
+          <div class="bento-progress-fill" style="width: 66%;"></div>
+        </div>
+        <div class="bento-footer-note">
+          <span id="kpi-baseline-text">Noise Floor: 3.50</span>
+          <span>OFDM</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento Row 2: Hero Visualizers -->
+    <section class="bento-visualizers-row">
+
+      <!-- Left: 2D Multi-Subcarrier Waterfall Spectrogram -->
+      <div class="console-panel">
+        <div class="panel-deck-header">
+          <div class="deck-title-group">
+            <span class="deck-badge">WATERFALL</span>
+            <h3 class="deck-title">Multi-Subcarrier Waterfall Heatmap</h3>
+          </div>
+          <div class="deck-legend">
+            <span>Static Ambient</span>
+            <div class="gradient-legend-bar"></div>
+            <span>Intense Motion</span>
+          </div>
+        </div>
+
+        <div class="instrument-viewport">
+          <canvas id="spectrogram-canvas" width="600" height="140"></canvas>
+          <div class="viewport-footer-caption">← 20 MHz 802.11n Wi-Fi OFDM Subcarriers (-26 to +26) →</div>
+        </div>
+      </div>
+
+      <!-- Right: Real-Time Oscilloscope Waveform -->
+      <div class="console-panel">
+        <div class="panel-deck-header">
+          <div class="deck-title-group">
+            <span class="deck-badge blue">OSCILLOSCOPE</span>
+            <h3 class="deck-title">Disturbance Energy & Adaptive Limit</h3>
+          </div>
+          <div class="deck-legend">
+            <span class="legend-swatch"><span class="swatch-dot blue"></span> Energy</span>
+            <span class="legend-swatch"><span class="swatch-dot amber"></span> Threshold</span>
+            <span class="legend-swatch"><span class="swatch-dot red"></span> Noise Floor</span>
+          </div>
+        </div>
+
+        <div class="instrument-viewport">
+          <canvas id="waveform-canvas" width="600" height="140"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Bento Row 3: Subcarrier Equalizer & Precision DSP Deck -->
+    <section class="bento-controls-row">
+
+      <!-- Real-time 52-Channel Equalizer Spectrum -->
+      <div class="console-panel">
+        <div class="panel-deck-header">
+          <div class="deck-title-group">
+            <span class="deck-badge purple">EQUALIZER</span>
+            <h3 class="deck-title">52-Channel Subcarrier Jitter Spectrum</h3>
+          </div>
+        </div>
+        <div class="instrument-viewport">
+          <canvas id="spectrum-canvas" width="650" height="110"></canvas>
+        </div>
+      </div>
+
+      <!-- Comprehensive Precision DSP & Sensitivity Deck -->
+      <div class="console-panel">
+        <div class="panel-deck-header">
+          <div class="deck-title-group">
+            <span class="deck-badge">DSP DECK</span>
+            <h3 class="deck-title">Sensitivity & Dynamic Threshold Calibrator</h3>
+          </div>
+        </div>
+
+        <!-- Tactile Presets Strip -->
+        <div class="presets-pill-deck">
+          <span class="deck-caption-pill">PRESETS:</span>
+          <button class="preset-chip-btn" id="preset-micro" title="Extreme sensitivity: breathing & sitting still">🫁
+            Micro-Presence</button>
+          <button class="preset-chip-btn active" id="preset-balanced" title="Standard room coverage">👤
+            Balanced</button>
+          <button class="preset-chip-btn" id="preset-walking" title="Alarm only on walking">🏃 Walking Alarm</button>
+          <button class="preset-chip-btn" id="preset-pet" title="Ignores small pets & vibrations">🐾 Pet Immune</button>
+        </div>
+
+        <!-- Sliders Matrix -->
+        <div class="sliders-console-matrix">
+          <!-- 1. Sensitivity Multiplier -->
+          <div class="slider-deck-module">
+            <div class="slider-module-top">
+              <label class="slider-label" for="slider-sens">Sensitivity Multiplier</label>
+              <span class="slider-readout" id="val-sens">2.2x</span>
+            </div>
+            <input type="range" id="slider-sens" min="1.0" max="8.0" step="0.1" value="2.2">
+            <div class="slider-sub-hints">
+              <span>1.0x (Hyper)</span>
+              <span>8.0x (Strict)</span>
+            </div>
+          </div>
+
+          <!-- 2. Noise Margin Offset -->
+          <div class="slider-deck-module">
+            <div class="slider-module-top">
+              <label class="slider-label" for="slider-offset">Noise Margin Offset</label>
+              <span class="slider-readout" id="val-offset">4.5</span>
+            </div>
+            <input type="range" id="slider-offset" min="0.5" max="25.0" step="0.5" value="4.5">
+            <div class="slider-sub-hints">
+              <span>0.5 (Hair-trigger)</span>
+              <span>25.0 (High barrier)</span>
+            </div>
+          </div>
+
+          <!-- 3. Pre-Amp Motion Gain -->
+          <div class="slider-deck-module">
+            <div class="slider-module-top">
+              <label class="slider-label" for="slider-gain">Pre-Amp Motion Gain</label>
+              <span class="slider-readout" id="val-gain">1.0x</span>
+            </div>
+            <input type="range" id="slider-gain" min="0.3" max="3.5" step="0.1" value="1.0">
+            <div class="slider-sub-hints">
+              <span>0.3x (Attenuate)</span>
+              <span>3.5x (Boost)</span>
+            </div>
+          </div>
+
+          <!-- 4. Direct Manual Threshold Override -->
+          <div class="slider-deck-module">
+            <div class="slider-module-top">
+              <label class="slider-label" for="slider-manual-thresh">Manual Threshold Override</label>
+              <span class="slider-readout" id="val-manual-thresh">AUTO</span>
+            </div>
+            <input type="range" id="slider-manual-thresh" min="0" max="50" step="1" value="0">
+            <div class="slider-sub-hints">
+              <span>0 (Auto-Adaptive)</span>
+              <span>50 (Fixed Max)</span>
+            </div>
+          </div>
+
+          <!-- 5. Trigger Frames Debounce -->
+          <div class="slider-deck-module">
+            <div class="slider-module-top">
+              <label class="slider-label" for="slider-trigger">Trigger Debounce</label>
+              <span class="slider-readout" id="val-trigger">2 frames</span>
+            </div>
+            <input type="range" id="slider-trigger" min="1" max="6" step="1" value="2">
+            <div class="slider-sub-hints">
+              <span>1 (Instant 40ms)</span>
+              <span>6 (Deep smooth)</span>
+            </div>
+          </div>
+
+          <!-- 6. Alert Hold Duration -->
+          <div class="slider-deck-module">
+            <div class="slider-module-top">
+              <label class="slider-label" for="slider-hold">Alert Hold Duration</label>
+              <span class="slider-readout" id="val-hold">1500 ms</span>
+            </div>
+            <input type="range" id="slider-hold" min="300" max="6000" step="200" value="1500">
+            <div class="slider-sub-hints">
+              <span>0.3s (Rapid)</span>
+              <span>6.0s (Sustained)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Bento Row 4: Intrusion Audit Stream -->
+    <section class="audit-stream-card">
+      <div class="panel-deck-header" style="margin-bottom: 0;">
+        <div class="deck-title-group">
+          <span class="deck-badge">AUDIT LOG</span>
+          <h3 class="deck-title">Intrusion & RF Sensor Event Timeline</h3>
+        </div>
+        <button id="btn-clear-logs" class="tactile-btn" style="height: 30px; font-size: 0.72rem; padding: 0 10px;">Clear
+          Timeline</button>
+      </div>
+
+      <div class="stream-table-viewport">
+        <table class="stream-table">
+          <thead>
+            <tr>
+              <th>TIMESTAMP</th>
+              <th>EVENT TYPE</th>
+              <th>MOTION SCORE</th>
+              <th>THRESHOLD</th>
+              <th>BEACON LINK</th>
+              <th>AUDIT DETAILS</th>
+            </tr>
+          </thead>
+          <tbody id="log-tbody">
+            <tr>
+              <td>00:00:00</td>
+              <td><span class="badge info">READY</span></td>
+              <td>0.00</td>
+              <td>12.00</td>
+              <td>Awaiting Connection</td>
+              <td>Next-Gen RF·CSI Sensing Console initialized. Multipath filters active.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Console Footer Bar -->
+  <footer class="console-footer-bar">
+    <div class="footer-connection-cluster">
+      <span class="footer-pulse-dot" id="footer-dot"></span>
+      <span id="footer-text">SERIAL PORT: NOT CONNECTED</span>
+    </div>
+    <div>
+      <span>RF·CSI LAB CONSOLE // ESP32-WROOM-32 CSI + ESP8266 2.4 GHz OFDM // AXIS DESIGN SYSTEM</span>
+    </div>
+  </footer>
+
+  <script src="radar.js"></script>
+</body>
+
+</html>
