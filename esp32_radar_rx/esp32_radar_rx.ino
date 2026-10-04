@@ -16,9 +16,19 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <esp_wifi.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
 #define RADAR_WIFI_CHANNEL 1
 #define LED_PIN 2
+#define I2C_SDA_PIN 21
+#define I2C_SCL_PIN 22
+
+// 20x4 LCD Controller
+LiquidCrystal_I2C *lcd = nullptr;
+bool lcdDetected = false;
+unsigned long lastLcdUpdate = 0;
+#define LCD_REFRESH_INTERVAL_MS 250
 
 // Radar Pulse packet structure
 typedef struct __attribute__((packed)) {
@@ -342,6 +352,41 @@ void setup() {
     Serial.println(F("[OK] CSI Engine initialized."));
   }
 
+  // Initialize I2C and detect LCD backpack address (0x27, 0x3F, 0x26, 0x38)
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+  uint8_t lcdAddr = 0;
+  uint8_t possibleAddrs[] = {0x27, 0x3F, 0x26, 0x38};
+  for (uint8_t a : possibleAddrs) {
+    Wire.beginTransmission(a);
+    if (Wire.endTransmission() == 0) {
+      lcdAddr = a;
+      break;
+    }
+  }
+
+  if (lcdAddr != 0) {
+    lcd = new LiquidCrystal_I2C(lcdAddr, 20, 4);
+    lcd->init();
+    lcd->backlight();
+    lcd->clear();
+    lcd->setCursor(0, 0);
+    lcd->print(F(" RF-CSI RADAR SENS  "));
+    lcd->setCursor(0, 1);
+    lcd->print(F(" ESP32+ESP8266 LINK "));
+    lcd->setCursor(0, 2);
+    lcd->print(F(" INITIALIZING DSP.. "));
+    lcd->setCursor(0, 3);
+    lcd->print(F(" I2C ADDR: 0x"));
+    if (lcdAddr < 16) lcd->print("0");
+    lcd->print(lcdAddr, HEX);
+    lcdDetected = true;
+    Serial.printf("[LCD] 20x4 I2C LCD detected and initialized at 0x%02X\n", lcdAddr);
+    delay(1200);
+    lcd->clear();
+  } else {
+    Serial.println(F("[LCD] No I2C LCD detected at 0x27/0x3F. Continuing without LCD."));
+  }
+
   Serial.println(F("[STATUS] Radar active. Ready for Web Dashboard."));
 }
 
@@ -482,5 +527,44 @@ void loop() {
     Serial.print(" SubVar:");
     Serial.print(currentSubcarrierVariance, 2);
     Serial.println();
+  }
+
+  // Non-blocking 20x4 LCD Refresh Routine (every 250ms)
+  if (lcdDetected && lcd && (now - lastLcdUpdate >= LCD_REFRESH_INTERVAL_MS)) {
+    lastLcdUpdate = now;
+
+    // Line 0: Overall Status
+    lcd->setCursor(0, 0);
+    if (!beaconConnected) {
+      lcd->print(F("STATUS: BCN OFFLINE "));
+    } else if (motionDetected) {
+      lcd->print(F("! INTRUSION ALERT ! "));
+    } else if (filteredMotionScore > (ambientNoiseBaseline * 1.3f)) {
+      lcd->print(F("STATUS: MICRO-MOTION"));
+    } else {
+      lcd->print(F("STATUS: ROOM SECURE "));
+    }
+
+    // Line 1: Motion Score & Dynamic Threshold Limit
+    char line1[21];
+    snprintf(line1, sizeof(line1), "MOT:%5.1f  LIM:%5.1f ", filteredMotionScore, dynamicThreshold);
+    lcd->setCursor(0, 1);
+    lcd->print(line1);
+
+    // Line 2: Beacon Status & Signal RSSI
+    char line2[21];
+    if (beaconConnected) {
+      snprintf(line2, sizeof(line2), "BCN: ONLINE  %3d dBm", beaconRssi);
+    } else {
+      snprintf(line2, sizeof(line2), "BCN: SEARCHING...   ");
+    }
+    lcd->setCursor(0, 2);
+    lcd->print(line2);
+
+    // Line 3: Packet Rate & Ambient Noise Floor
+    char line3[21];
+    snprintf(line3, sizeof(line3), "RATE:%2.0fPPS  FLR:%4.1f", beaconPacketsPerSec, ambientNoiseBaseline);
+    lcd->setCursor(0, 3);
+    lcd->print(line3);
   }
 }
